@@ -18,8 +18,19 @@ class BlogPostTest(TestCase):
             title='Post2',
             text='Lorem Ipsum post2',
             status=Post.STATUS_CHOICES[1][0], # draft
-            author=cls.user,
+            author=cls.user,b
         )
+
+    def test_post_update_view(self):
+        response = self.client.post(reverse('post_update', args=[self.post2.id]), {
+            'title': 'Post2 Updated',
+            'text': 'This text is Updated',
+            'status': 'pub',
+            'author': self.post2.author.id,
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Post.objects.last().title, 'Post2 Updated')
+        self.assertEqual(Post.objects.last().text, 'This text is Updated')
 
     def test_post_model_str(self):
         post = self.post1
@@ -73,17 +84,6 @@ class BlogPostTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Post.objects.last().title, 'Some Title')
         self.assertEqual(Post.objects.last().text, 'This is some text!')
-
-    def test_post_update_view(self):
-        response = self.client.post(reverse('post_update', args=[self.post2.id]), {
-            'title': 'Post2 Updated',
-            'text': 'This text is Updated',
-            'status': 'pub',
-            'author': self.post2.author.id,
-        })
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Post.objects.last().title, 'Post2 Updated')
-        self.assertEqual(Post.objects.last().text, 'This text is Updated')
 
     def test_post_delete_view(self):
         response = self.client.post(reverse('post_delete', args=[self.post2.id]),)
